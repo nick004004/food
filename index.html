@@ -61,25 +61,25 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 16px 12px 48px;
+      padding: 12px 10px 40px;
       transition: background-color 0.25s, color 0.25s;
     }
 
     header {
       width: 100%;
-      max-width: 900px;
+      max-width: 850px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       padding: 0 4px;
     }
 
     .header-title {
       display: flex;
       align-items: baseline;
-      gap: 6px;
-      font-size: 1.3rem;
+      gap: 4px;
+      font-size: 1.1rem;
       font-weight: 800;
     }
 
@@ -88,23 +88,23 @@
     }
 
     .header-title .author-tag {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 600;
       color: var(--text-muted);
-      margin-left: 4px;
+      margin-left: 2px;
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .header-btn {
-      padding: 6px 12px;
-      font-size: 0.8rem;
+      padding: 5px 10px;
+      font-size: 0.75rem;
       font-weight: 700;
-      border-radius: 20px;
+      border-radius: 16px;
       border: 1px solid var(--card-border);
       background: var(--card-bg);
       color: var(--text-main);
@@ -114,17 +114,17 @@
 
     .app-container {
       width: 100%;
-      max-width: 900px;
+      max-width: 850px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
     }
 
     .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 20px;
-      padding: 20px;
+      border-radius: 16px;
+      padding: 14px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     }
 
@@ -132,21 +132,21 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
     .section-title {
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 800;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
 
     .section-links {
       display: flex;
-      gap: 8px;
-      font-size: 0.8rem;
+      gap: 6px;
+      font-size: 0.75rem;
     }
 
     .section-link {
@@ -163,8 +163,8 @@
     /* 메인 카테고리 그리드 */
     .main-category-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+      gap: 8px;
     }
 
     .cat-card-btn {
@@ -172,22 +172,22 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 14px 6px;
-      border-radius: 16px;
+      padding: 10px 4px;
+      border-radius: 12px;
       border: 1px solid var(--card-border);
       background: var(--input-bg);
       color: var(--text-main);
       cursor: pointer;
       transition: all 0.15s;
-      gap: 6px;
+      gap: 4px;
     }
 
     .cat-card-btn .cat-icon {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
     }
 
     .cat-card-btn .cat-name {
-      font-size: 0.82rem;
+      font-size: 0.75rem;
       font-weight: 700;
     }
 
@@ -195,24 +195,24 @@
       background: var(--primary);
       color: #ffffff;
       border-color: var(--primary);
-      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+      box-shadow: 0 3px 8px rgba(79, 70, 229, 0.3);
     }
 
     /* 서브 탭 & 검색 컨트롤 */
     .sub-tabs-container {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 12px;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
     }
 
     .sub-tab-btn {
-      padding: 6px 12px;
-      font-size: 0.78rem;
+      padding: 5px 10px;
+      font-size: 0.72rem;
       font-weight: 700;
       white-space: nowrap;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid var(--card-border);
       background: var(--input-bg);
       color: var(--text-muted);
@@ -227,16 +227,16 @@
 
     .controls-row {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
     .search-input {
-      flex: 1 1 180px;
-      padding: 10px 14px;
-      font-size: 0.85rem;
-      border-radius: 10px;
+      flex: 1 1 140px;
+      padding: 8px 10px;
+      font-size: 0.78rem;
+      border-radius: 8px;
       border: 1px solid var(--card-border);
       background: var(--input-bg);
       color: var(--text-main);
@@ -245,15 +245,15 @@
 
     .control-btn-group {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       flex-wrap: wrap;
     }
 
     .action-btn {
-      padding: 8px 12px;
-      font-size: 0.78rem;
+      padding: 6px 10px;
+      font-size: 0.72rem;
       font-weight: 700;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid var(--card-border);
       background: var(--input-bg);
       color: var(--text-main);
@@ -276,9 +276,9 @@
     /* 품목 체크박스 카드 그리드 */
     .item-card-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-      gap: 8px;
-      max-height: 280px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 6px;
+      max-height: 240px;
       overflow-y: auto;
       padding-right: 2px;
     }
@@ -287,8 +287,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 12px;
-      border-radius: 12px;
+      padding: 8px 10px;
+      border-radius: 10px;
       border: 1px solid var(--card-border);
       background: var(--item-card-bg);
       cursor: pointer;
@@ -302,14 +302,14 @@
     .item-left {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       overflow: hidden;
       flex: 1;
     }
 
     .item-card input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       accent-color: var(--primary);
       flex-shrink: 0;
     }
@@ -323,11 +323,11 @@
     .item-title-row {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
 
     .item-title {
-      font-size: 0.85rem;
+      font-size: 0.78rem;
       font-weight: 700;
       line-height: 1.2;
       white-space: nowrap;
@@ -336,9 +336,9 @@
     }
 
     .user-badge {
-      font-size: 0.65rem;
-      padding: 1px 5px;
-      border-radius: 4px;
+      font-size: 0.6rem;
+      padding: 1px 4px;
+      border-radius: 3px;
       background: var(--user-tag-bg);
       color: var(--user-tag-text);
       font-weight: 700;
@@ -346,16 +346,16 @@
     }
 
     .item-price {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
-      margin-top: 2px;
+      margin-top: 1px;
     }
 
     .item-del-btn {
       background: none;
       border: none;
       color: var(--accent);
-      font-size: 0.85rem;
+      font-size: 0.78rem;
       cursor: pointer;
       padding: 4px;
       flex-shrink: 0;
@@ -370,9 +370,9 @@
 
     .canvas-wrapper {
       position: relative;
-      width: 280px;
-      height: 280px;
-      margin-bottom: 20px;
+      width: 240px;
+      height: 240px;
+      margin-bottom: 16px;
     }
 
     canvas {
@@ -384,30 +384,30 @@
 
     .pointer {
       position: absolute;
-      top: -14px;
+      top: -12px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 14px solid transparent;
-      border-right: 14px solid transparent;
-      border-top: 26px solid var(--accent);
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 22px solid var(--accent);
       z-index: 10;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
     }
 
     .spin-btn {
       width: 100%;
-      max-width: 320px;
-      padding: 16px;
-      font-size: 1.15rem;
+      max-width: 280px;
+      padding: 14px;
+      font-size: 1rem;
       font-weight: 800;
       color: #ffffff;
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
       border: none;
-      border-radius: 14px;
+      border-radius: 12px;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
     }
 
     .spin-btn:disabled {
@@ -418,32 +418,32 @@
 
     /* 당첨 기록 */
     .stats-summary {
-      font-size: 0.82rem;
+      font-size: 0.75rem;
       font-weight: 700;
       color: var(--badge-text);
       background: var(--badge-bg);
-      padding: 10px 14px;
-      border-radius: 10px;
-      margin-bottom: 12px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
     }
 
     .history-list {
-      max-height: 160px;
+      max-height: 140px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
 
     .history-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 12px;
-      border-radius: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
       border: 1px solid var(--card-border);
       background: var(--input-bg);
-      font-size: 0.85rem;
+      font-size: 0.78rem;
     }
 
     .history-item-name {
@@ -451,37 +451,28 @@
     }
 
     .history-item-time {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
-    }
-
-    .del-history-btn {
-      background: none;
-      border: none;
-      color: var(--accent);
-      cursor: pointer;
-      font-weight: 700;
-      margin-left: 8px;
     }
 
     /* 피드백 커뮤니티 섹션 */
     .feedback-form {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 6px;
+      margin-bottom: 12px;
     }
 
     .feedback-textarea {
       width: 100%;
-      padding: 12px;
-      font-size: 0.85rem;
-      border-radius: 10px;
+      padding: 10px;
+      font-size: 0.78rem;
+      border-radius: 8px;
       border: 1px solid var(--card-border);
       background: var(--input-bg);
       color: var(--text-main);
       resize: vertical;
-      min-height: 70px;
+      min-height: 60px;
       outline: none;
     }
 
@@ -489,14 +480,14 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .feedback-pwd-input {
-      width: 130px;
-      padding: 8px 12px;
-      font-size: 0.82rem;
-      border-radius: 8px;
+      width: 120px;
+      padding: 7px 10px;
+      font-size: 0.75rem;
+      border-radius: 6px;
       border: 1px solid var(--card-border);
       background: var(--input-bg);
       color: var(--text-main);
@@ -504,10 +495,10 @@
     }
 
     .feedback-submit-btn {
-      padding: 8px 16px;
-      font-size: 0.8rem;
+      padding: 7px 14px;
+      font-size: 0.75rem;
       font-weight: 700;
-      border-radius: 8px;
+      border-radius: 6px;
       background: var(--primary);
       color: #fff;
       border: none;
@@ -517,53 +508,53 @@
     .feedback-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      max-height: 320px;
+      gap: 8px;
+      max-height: 280px;
       overflow-y: auto;
     }
 
     .feedback-card {
-      padding: 12px;
-      border-radius: 12px;
+      padding: 10px;
+      border-radius: 10px;
       border: 1px solid var(--card-border);
       background: var(--input-bg);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
 
     .feedback-text {
-      font-size: 0.88rem;
+      font-size: 0.8rem;
       word-break: break-all;
-      line-height: 1.4;
+      line-height: 1.35;
     }
 
     .feedback-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
     }
 
     .feedback-actions {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       align-items: center;
     }
 
     .like-btn {
       background: none;
       border: 1px solid var(--card-border);
-      padding: 4px 10px;
-      border-radius: 12px;
+      padding: 3px 8px;
+      border-radius: 10px;
       cursor: pointer;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 700;
       color: var(--text-main);
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
     }
 
     .like-btn.liked {
@@ -575,27 +566,27 @@
     .fb-action-sm {
       background: none;
       border: 1px solid var(--card-border);
-      padding: 4px 8px;
-      border-radius: 8px;
-      font-size: 0.7rem;
+      padding: 3px 6px;
+      border-radius: 6px;
+      font-size: 0.65rem;
       color: var(--text-muted);
       cursor: pointer;
     }
 
     .reply-list {
-      margin-top: 6px;
-      padding-left: 10px;
+      margin-top: 5px;
+      padding-left: 8px;
       border-left: 2px solid var(--primary);
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
 
     .reply-item {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       background: var(--card-bg);
-      padding: 6px 10px;
-      border-radius: 8px;
+      padding: 5px 8px;
+      border-radius: 6px;
       border: 1px solid var(--card-border);
       display: flex;
       justify-content: space-between;
@@ -604,14 +595,14 @@
 
     .reply-input-row {
       display: flex;
-      gap: 6px;
-      margin-top: 6px;
+      gap: 5px;
+      margin-top: 5px;
     }
 
     .reply-input {
       flex: 1;
-      padding: 6px 10px;
-      font-size: 0.78rem;
+      padding: 5px 8px;
+      font-size: 0.72rem;
       border-radius: 6px;
       border: 1px solid var(--card-border);
       background: var(--card-bg);
@@ -620,8 +611,8 @@
     }
 
     .reply-btn {
-      padding: 6px 10px;
-      font-size: 0.75rem;
+      padding: 5px 8px;
+      font-size: 0.7rem;
       font-weight: 700;
       border-radius: 6px;
       background: var(--card-bg);
@@ -646,7 +637,7 @@
       pointer-events: none;
       transition: opacity 0.2s ease;
       z-index: 100;
-      padding: 16px;
+      padding: 12px;
     }
 
     .modal-overlay.active {
@@ -657,43 +648,43 @@
     .modal {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 24px;
-      padding: 24px;
+      border-radius: 20px;
+      padding: 20px;
       width: 100%;
-      max-width: 380px;
+      max-width: 340px;
       text-align: center;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
     }
 
     .modal h2 {
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: var(--text-main);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       font-weight: 800;
     }
 
     .result-name {
-      font-size: 1.7rem;
+      font-size: 1.4rem;
       font-weight: 800;
       color: var(--primary);
-      margin: 16px 0 22px;
+      margin: 12px 0 18px;
       word-break: keep-all;
     }
 
     .guide-content {
       text-align: left;
-      font-size: 0.85rem;
-      line-height: 1.6;
+      font-size: 0.78rem;
+      line-height: 1.5;
       color: var(--text-main);
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-bottom: 16px;
     }
 
     .guide-step {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: flex-start;
     }
 
@@ -701,39 +692,39 @@
       background: var(--primary);
       color: #fff;
       font-weight: 800;
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       flex-shrink: 0;
     }
 
     .modal-input {
       width: 100%;
-      padding: 12px;
-      font-size: 0.9rem;
-      border-radius: 10px;
+      padding: 10px;
+      font-size: 0.85rem;
+      border-radius: 8px;
       border: 1px solid var(--card-border);
       background: var(--input-bg);
       color: var(--text-main);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       outline: none;
     }
 
     .modal-btns {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
 
     .modal-btn {
-      padding: 14px;
-      font-size: 0.95rem;
+      padding: 12px;
+      font-size: 0.85rem;
       font-weight: 700;
-      border-radius: 12px;
+      border-radius: 10px;
       border: none;
       cursor: pointer;
     }
@@ -768,7 +759,7 @@
     <div class="card">
       <div class="section-header">
         <div class="section-title">
-          <span>🥞 메인 카테고리 (한눈에 전체 선택)</span>
+          <span>🥞 메인 카테고리 (선택 시 룰렛 전환)</span>
         </div>
         <div class="section-links">
           <span class="section-link" id="globalSelectAllBtn">전체 선택</span>
@@ -791,10 +782,10 @@
       <div class="controls-row">
         <input type="text" id="searchInput" class="search-input" placeholder="🔍 품목 검색...">
         <div class="control-btn-group">
-          <button id="addItemOpenModalBtn" class="action-btn add-btn">➕ 품목 직접 추가</button>
-          <button id="selectSubAllBtn" class="action-btn">현재 탭 전체선택</button>
+          <button id="addItemOpenModalBtn" class="action-btn add-btn">➕ 품목 추가</button>
+          <button id="selectSubAllBtn" class="action-btn">현재 탭 선택</button>
           <button id="deselectSubAllBtn" class="action-btn">현재 탭 해제</button>
-          <button id="resetAllBtn" class="action-btn reset-btn">🔄 품목 초기화</button>
+          <button id="resetAllBtn" class="action-btn reset-btn">🔄 초기화</button>
         </div>
       </div>
 
@@ -813,8 +804,8 @@
     <!-- 당첨 기록 카드 -->
     <div class="card">
       <div class="section-header">
-        <div class="section-title">🏆 당첨 기록 & 통계</div>
-        <span class="section-link" id="clearHistoryBtn">기록 비우기</span>
+        <div class="section-title">🏆 전체 당첨 기록 & 통계</div>
+        <span class="section-link" id="clearHistoryBtn">기록 비우기 (관리자)</span>
       </div>
       <div id="statsSummary" class="stats-summary">아직 당첨 기록이 없습니다.</div>
       <div id="historyList" class="history-list"></div>
@@ -868,19 +859,19 @@
       <div class="guide-content">
         <div class="guide-step">
           <div class="guide-num">1</div>
-          <div><b>카테고리 & 품목 선택:</b> 원하는 편의점 메뉴 카테고리를 누르고 체크박스로 품목을 골라주세요.</div>
+          <div><b>카테고리 선택:</b> 메인 카테고리를 누르면 해당 카테고리 품목들만 룰렛에 바로 연동됩니다.</div>
         </div>
         <div class="guide-step">
           <div class="guide-num">2</div>
-          <div><b>품목 직접 추가:</b> '➕ 품목 직접 추가' 버튼으로 나만의 메뉴를 등록하면 모든 사용자에게 공유됩니다!</div>
+          <div><b>품목 직접 추가:</b> 나만의 메뉴를 등록하면 실시간으로 모두에게 공유됩니다.</div>
         </div>
         <div class="guide-step">
           <div class="guide-num">3</div>
-          <div><b>룰렛 돌리기:</b> 하단의 '🎯 룰렛 돌리기!' 버튼을 누르면 무작위로 메뉴가 추첨됩니다.</div>
+          <div><b>실시간 당첨 기록:</b> 친구들과 함께 룰렛을 돌린 전체 기록이 동기화됩니다. (기록 비우기는 관리자 전용: Yoonsung004)</div>
         </div>
         <div class="guide-step">
           <div class="guide-num">4</div>
-          <div><b>유저 커뮤니티:</b> 피드백 등록 시 4자리 비밀번호를 설정하여, 내 의견을 안전하게 수정·삭제할 수 있습니다.</div>
+          <div><b>유저 커뮤니티:</b> 피드백 등록 시 4자리 비밀번호로 내 의견을 안전하게 관리하세요.</div>
         </div>
       </div>
       <button id="closeHelpBtn" class="modal-btn primary">알겠어요!</button>
@@ -895,6 +886,7 @@
     let db = null;
     let userCustomItems = {};
     let feedbacks = {};
+    let historyRecords = [];
 
     const DEFAULT_DATABASE = {
       gimbap: {
@@ -997,7 +989,6 @@
     let isSpinning = false;
     let currentRotation = 0;
     let audioCtx = null;
-    let historyRecords = [];
 
     const canvas = document.getElementById("rouletteCanvas");
     const ctx = canvas.getContext("2d");
@@ -1102,6 +1093,14 @@
           feedbacks = snapshot.val() || {};
           renderFeedbacks();
         });
+
+        const historyRef = ref(db, 'rouletteHistory');
+        onValue(historyRef, (snapshot) => {
+          const data = snapshot.val() || {};
+          historyRecords = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+          renderHistory();
+        });
+
       } catch (e) {
         console.warn("Firebase 로드 실패, 로컬 모드로 동작합니다.", e);
       }
@@ -1109,12 +1108,10 @@
       initTheme();
       renderMainCategories();
       
-      Object.keys(DEFAULT_DATABASE).forEach(catKey => {
-        DEFAULT_DATABASE[catKey].items.forEach(item => selectedItems.add(item.name));
-      });
+      // 초기 기본 선택: 첫 번째 카테고리(김밥)의 품목들만 선택되도록 설정
+      loadCategoryDefaultItems("gimbap");
 
       switchCategory("gimbap");
-      loadHistory();
 
       themeToggleBtn.addEventListener("click", toggleTheme);
       helpBtn.addEventListener("click", () => helpModal.classList.add("active"));
@@ -1123,6 +1120,7 @@
       closeAddItemBtn.addEventListener("click", () => addItemModal.classList.remove("active"));
       confirmAddItemBtn.addEventListener("click", addNewCustomItem);
       submitFeedbackBtn.addEventListener("click", submitFeedback);
+      clearHistoryBtn.addEventListener("click", clearHistoryByAdmin);
 
       document.getElementById("globalSelectAllBtn").addEventListener("click", globalSelectAll);
       document.getElementById("globalDeselectAllBtn").addEventListener("click", globalDeselectAll);
@@ -1133,7 +1131,6 @@
       spinBtn.addEventListener("click", spinRoulette);
       closeModalBtn.addEventListener("click", () => resultModal.classList.remove("active"));
       excludeBtn.addEventListener("click", excludeLastItemAndSpin);
-      clearHistoryBtn.addEventListener("click", clearHistory);
     }
 
     function renderMainCategories() {
@@ -1148,6 +1145,16 @@
       });
     }
 
+    // 메인 카테고리 전환 시 해당 카테고리 품목들만 선택 상태로 초기화(변경)
+    function loadCategoryDefaultItems(key) {
+      selectedItems.clear();
+      if (DEFAULT_DATABASE[key]) {
+        DEFAULT_DATABASE[key].items.forEach(item => selectedItems.add(item.name));
+      }
+      const customObj = userCustomItems[key] || {};
+      Object.values(customObj).forEach(item => selectedItems.add(item.name));
+    }
+
     function switchCategory(key) {
       currentCatKey = key;
       currentSubTab = "all";
@@ -1158,6 +1165,9 @@
 
       const cat = DEFAULT_DATABASE[key];
       subCategoryHeaderTitle.innerHTML = `<span>${cat.icon} ${cat.name} 품목 상세</span>`;
+
+      // 카테고리 변경 시 해당 카테고리 품목으로 룰렛 자동 초기화
+      loadCategoryDefaultItems(key);
 
       renderSubTabs();
       renderItems();
@@ -1215,7 +1225,7 @@
       });
 
       if (filtered.length === 0) {
-        itemGridContainer.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:var(--text-muted); padding:20px; font-size:0.85rem;">해당 조건의 품목이 없습니다.</div>`;
+        itemGridContainer.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:var(--text-muted); padding:16px; font-size:0.78rem;">해당 조건의 품목이 없습니다.</div>`;
         drawRoulette();
         return;
       }
@@ -1396,7 +1406,7 @@
         ctx.fillStyle = isDark ? "#334155" : "#e2e8f0";
         ctx.fill();
         ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
-        ctx.font = "bold 20px sans-serif";
+        ctx.font = "bold 16px sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("품목을 선택해주세요", centerX, centerY);
@@ -1432,20 +1442,20 @@
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#FFFFFF";
 
-        let fontSize = 20;
-        if (numSlices > 12) fontSize = 15;
+        let fontSize = 18;
+        if (numSlices > 12) fontSize = 14;
         if (numSlices > 24) fontSize = 10;
         ctx.font = `bold ${fontSize}px sans-serif`;
 
         let text = items[i].name;
         if (text.length > 9 && numSlices > 10) text = text.substring(0, 8) + "..";
 
-        ctx.fillText(text, radius - 25, 0);
+        ctx.fillText(text, radius - 20, 0);
         ctx.restore();
       }
 
       ctx.beginPath();
-      ctx.arc(0, 0, 28, 0, Math.PI * 2);
+      ctx.arc(0, 0, 24, 0, Math.PI * 2);
       ctx.fillStyle = isDark ? "#1e293b" : "#ffffff";
       ctx.fill();
       ctx.lineWidth = 4;
@@ -1530,38 +1540,39 @@
       }
     }
 
-    function loadHistory() {
-      const saved = localStorage.getItem("rouletteHistory");
-      if (saved) {
-        try { historyRecords = JSON.parse(saved); } catch (e) { historyRecords = []; }
-      }
-      renderHistory();
-    }
-
-    function saveHistory() {
-      localStorage.setItem("rouletteHistory", JSON.stringify(historyRecords));
-    }
-
     function addHistoryRecord(itemName) {
       const now = new Date();
       const timeStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      historyRecords.unshift({ id: Date.now(), name: itemName, time: timeStr });
-      saveHistory();
-      renderHistory();
-    }
-
-    function deleteHistoryRecord(id) {
-      historyRecords = historyRecords.filter(r => r.id !== id);
-      saveHistory();
-      renderHistory();
-    }
-
-    function clearHistory() {
-      if (historyRecords.length === 0) return;
-      if (confirm("당첨 기록을 모두 비우시겠습니까?")) {
-        historyRecords = [];
-        saveHistory();
+      
+      if (db) {
+        const { ref, push, set } = window.firebaseModules;
+        const newRef = push(ref(db, 'rouletteHistory'));
+        set(newRef, { name: itemName, time: timeStr });
+      } else {
+        historyRecords.unshift({ id: 'loc_' + Date.now(), name: itemName, time: timeStr });
         renderHistory();
+      }
+    }
+
+    function clearHistoryByAdmin() {
+      const adminPwd = prompt("관리자 비밀번호를 입력하세요:");
+      if (!adminPwd) return;
+
+      if (adminPwd !== "Yoonsung004") {
+        alert("비밀번호가 일치하지 않습니다. (관리자 전용)");
+        return;
+      }
+
+      if (confirm("전체 당첨 기록을 초기화하시겠습니까?")) {
+        if (db) {
+          const { ref, remove } = window.firebaseModules;
+          remove(ref(db, 'rouletteHistory')).then(() => {
+            alert("당첨 기록이 초기화되었습니다.");
+          });
+        } else {
+          historyRecords = [];
+          renderHistory();
+        }
       }
     }
 
@@ -1587,7 +1598,9 @@
 
       statsSummary.textContent = `총 ${historyRecords.length}회 돌림 | 최다 당첨: ${topItem} (${maxCount}회)`;
 
-      historyRecords.forEach(r => {
+      const sortedRecords = [...historyRecords].reverse();
+
+      sortedRecords.forEach(r => {
         const itemEl = document.createElement("div");
         itemEl.className = "history-item";
 
@@ -1595,26 +1608,16 @@
         infoSpan.className = "history-item-name";
         infoSpan.textContent = r.name;
 
-        const rightDiv = document.createElement("div");
         const timeSpan = document.createElement("span");
         timeSpan.className = "history-item-time";
         timeSpan.textContent = r.time;
 
-        const delBtn = document.createElement("button");
-        delBtn.className = "del-history-btn";
-        delBtn.textContent = "✕";
-        delBtn.addEventListener("click", () => deleteHistoryRecord(r.id));
-
-        rightDiv.appendChild(timeSpan);
-        rightDiv.appendChild(delBtn);
         itemEl.appendChild(infoSpan);
-        itemEl.appendChild(rightDiv);
-
+        itemEl.appendChild(timeSpan);
         historyListContainer.appendChild(itemEl);
       });
     }
 
-    // === 피드백 커뮤니티 기능 (비밀번호 인증 포함) ===
     function submitFeedback() {
       const text = feedbackInput.value.trim();
       const pwd = feedbackPwdInput.value.trim();
@@ -1736,7 +1739,7 @@
       const fbKeys = Object.keys(feedbacks);
 
       if (fbKeys.length === 0) {
-        feedbackListContainer.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:16px; font-size:0.82rem;">등록된 유저 의견이 없습니다. 첫 의견을 남겨보세요!</div>`;
+        feedbackListContainer.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:12px; font-size:0.75rem;">등록된 유저 의견이 없습니다. 첫 의견을 남겨보세요!</div>`;
         return;
       }
 
@@ -1793,7 +1796,7 @@
           Object.values(fb.replies).forEach(rep => {
             const rItem = document.createElement("div");
             rItem.className = "reply-item";
-            rItem.innerHTML = `<span>💬 ${rep.text}</span><span style="font-size:0.7rem; color:var(--text-muted);">${rep.time}</span>`;
+            rItem.innerHTML = `<span>💬 ${rep.text}</span><span style="font-size:0.65rem; color:var(--text-muted);">${rep.time}</span>`;
             rList.appendChild(rItem);
           });
           replyContainer.appendChild(rList);
