@@ -537,7 +537,7 @@
       box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
     }
 
-    /* 관리자 작성 의견 강조 디자인 (딱 봐도 관리자처럼 보이게 확실히 차별화) */
+    /* 관리자 작성 의견 강조 디자인 */
     .feedback-card.admin-feedback {
       border: 2px solid #4f46e5;
       background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(79, 70, 229, 0.02) 100%);
@@ -796,7 +796,7 @@
   <header>
     <div class="header-title">
       🏪 <span>편의점</span> <span class="highlight">랜덤 룰렛</span>
-      <span class="author-tag">[Yoonsung]</span>
+      <span class="author-tag">[made by. Yoonsung]</span>
     </div>
     <div class="header-right">
       <button class="header-btn" id="helpBtn">사용법</button>
@@ -917,11 +917,11 @@
         </div>
         <div class="guide-step">
           <div class="guide-num">3</div>
-          <div><b>실시간 당첨 기록:</b> 친구들과 함께 룰렛을 돌린 전체 기록이 동기화됩니다. (기록 비우기는 관리자 전용: Yoonsung004)</div>
+          <div><b>실시간 당첨 기록:</b> 친구들과 함께 룰렛을 돌린 전체 기록이 동기화됩니다.</div>
         </div>
         <div class="guide-step">
           <div class="guide-num">4</div>
-          <div><b>유저 커뮤니티:</b> 피드백 등록 시 비밀번호에 <b>0589</b>를 입력하면 👑 관리자로 등록됩니다!</div>
+          <div><b>유저 커뮤니티:</b> 공감을 가장 많이 받은 의견은 베스트로 강조되며 맨 위에 정렬됩니다.</div>
         </div>
       </div>
       <button id="closeHelpBtn" class="modal-btn primary">알겠어요!</button>
@@ -1746,7 +1746,6 @@
       const now = new Date();
       const timeStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       
-      // 비밀번호가 0589인 경우 관리자 플래그 설정
       const isAdmin = (pwd === "0589");
 
       if (db) {
@@ -1858,7 +1857,6 @@
         return;
       }
 
-      // 공감순 정렬 (공감이 같으면 최신순)
       fbKeys.sort((a, b) => {
         const likesA = feedbacks[a].likes || 0;
         const likesB = feedbacks[b].likes || 0;
@@ -1877,7 +1875,6 @@
         const isBest = (index === 0 && (fb.likes || 0) > 0);
         const isAdmin = fb.isAdmin === true;
 
-        // 디자인 클래스 조합
         if (isAdmin) {
           card.className = "feedback-card admin-feedback";
         } else if (isBest) {
@@ -1891,7 +1888,6 @@
         contentWrapper.style.flexDirection = "column";
         contentWrapper.style.gap = "4px";
 
-        // 뱃지 표시 (관리자 배지가 최우선, 아니면 베스트 뱃지)
         if (isAdmin) {
           const adminBadge = document.createElement("div");
           adminBadge.className = "admin-badge";
