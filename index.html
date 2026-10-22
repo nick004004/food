@@ -530,11 +530,18 @@
       gap: 6px;
     }
 
-    /* 공감 1위 베스트 의견 강조 디자인 스타일 */
+    /* 공감 1위 베스트 의견 강조 디자인 */
     .feedback-card.best-feedback {
       border: 2px solid #f59e0b;
       background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.02) 100%);
       box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+    }
+
+    /* 관리자 작성 의견 강조 디자인 (딱 봐도 관리자처럼 보이게 확실히 차별화) */
+    .feedback-card.admin-feedback {
+      border: 2px solid #4f46e5;
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(79, 70, 229, 0.02) 100%);
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.2);
     }
 
     .best-badge {
@@ -549,6 +556,21 @@
       border-radius: 4px;
       width: fit-content;
       margin-bottom: 2px;
+    }
+
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      background: #4f46e5;
+      color: #ffffff;
+      padding: 3px 8px;
+      border-radius: 6px;
+      width: fit-content;
+      margin-bottom: 4px;
+      box-shadow: 0 2px 5px rgba(79, 70, 229, 0.3);
     }
 
     .feedback-text {
@@ -774,7 +796,7 @@
   <header>
     <div class="header-title">
       🏪 <span>편의점</span> <span class="highlight">랜덤 룰렛</span>
-      <span class="author-tag">[made by. Yoonsung]</span>
+      <span class="author-tag">[Yoonsung]</span>
     </div>
     <div class="header-right">
       <button class="header-btn" id="helpBtn">사용법</button>
@@ -899,7 +921,7 @@
         </div>
         <div class="guide-step">
           <div class="guide-num">4</div>
-          <div><b>유저 커뮤니티:</b> 피드백 등록 시 4자리 비밀번호로 내 의견을 안전하게 관리하세요.</div>
+          <div><b>유저 커뮤니티:</b> 피드백 등록 시 비밀번호에 <b>0589</b>를 입력하면 👑 관리자로 등록됩니다!</div>
         </div>
       </div>
       <button id="closeHelpBtn" class="modal-btn primary">알겠어요!</button>
@@ -1723,17 +1745,20 @@
 
       const now = new Date();
       const timeStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      
+      // 비밀번호가 0589인 경우 관리자 플래그 설정
+      const isAdmin = (pwd === "0589");
 
       if (db) {
         const { ref, push, set } = window.firebaseModules;
         const newRef = push(ref(db, 'feedbacks'));
-        set(newRef, { text, pwd, time: timeStr, likes: 0, replies: {} }).then(() => {
+        set(newRef, { text, pwd, isAdmin, time: timeStr, likes: 0, replies: {} }).then(() => {
           feedbackInput.value = "";
           feedbackPwdInput.value = "";
         });
       } else {
         const fakeId = 'fb_' + Date.now();
-        feedbacks[fakeId] = { text, pwd, time: timeStr, likes: 0, replies: {} };
+        feedbacks[fakeId] = { text, pwd, isAdmin, time: timeStr, likes: 0, replies: {} };
         feedbackInput.value = "";
         feedbackPwdInput.value = "";
         renderFeedbacks();
@@ -1833,33 +1858,46 @@
         return;
       }
 
-      // 공감(likes)이 높은 순으로 정렬 (공감이 같을 경우 최신 등록순)
+      // 공감순 정렬 (공감이 같으면 최신순)
       fbKeys.sort((a, b) => {
         const likesA = feedbacks[a].likes || 0;
         const likesB = feedbacks[b].likes || 0;
         if (likesB !== likesA) {
-          return likesB - likesA; // 공감 많은 순 내림차순
+          return likesB - likesA;
         }
-        return b.localeCompare(a); // 최신순
+        return b.localeCompare(a);
       });
 
       let likedSet = JSON.parse(localStorage.getItem("likedFeedbacks") || "{}");
-      const maxLikes = (fbKeys.length > 0) ? (feedbacks[fbKeys[0]].likes || 0) : -1;
 
       fbKeys.forEach((fbId, index) => {
         const fb = feedbacks[fbId];
         const card = document.createElement("div");
         
-        // 1등(공감 제일 많고 0보다 클 때)이거나 첫 번째 항목인 경우 베스트 강조 스타일 적용
         const isBest = (index === 0 && (fb.likes || 0) > 0);
-        card.className = isBest ? "feedback-card best-feedback" : "feedback-card";
+        const isAdmin = fb.isAdmin === true;
+
+        // 디자인 클래스 조합
+        if (isAdmin) {
+          card.className = "feedback-card admin-feedback";
+        } else if (isBest) {
+          card.className = "feedback-card best-feedback";
+        } else {
+          card.className = "feedback-card";
+        }
 
         const contentWrapper = document.createElement("div");
         contentWrapper.style.display = "flex";
         contentWrapper.style.flexDirection = "column";
         contentWrapper.style.gap = "4px";
 
-        if (isBest) {
+        // 뱃지 표시 (관리자 배지가 최우선, 아니면 베스트 뱃지)
+        if (isAdmin) {
+          const adminBadge = document.createElement("div");
+          adminBadge.className = "admin-badge";
+          adminBadge.innerHTML = `👑 관리자 공지 / 의견`;
+          contentWrapper.appendChild(adminBadge);
+        } else if (isBest) {
           const badge = document.createElement("div");
           badge.className = "best-badge";
           badge.innerHTML = `🔥 공감 1위 베스트 의견`;
