@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>편의점 메뉴 선택 룰렛 웹앱</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    window.firebaseModules = { initializeApp, getDatabase, ref, set, push, onValue, remove, update };
+  </script>
+  <style>
+    :root {
+      --bg-main: #f1f5f9;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --accent: #e11d48;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --input-bg: #f8fafc;
+      --item-card-bg: #ffffff;
+      --badge-bg: #e0e7ff;
+      --badge-text: #4338ca;
+      --user-tag-bg: #fef3c7;
+      --user-tag-text: #d97706;
+    }
+
+    [data-theme="dark"] {
+      --bg-main: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --input-bg: #0f172a;
+      --item-card-bg: #0f172a;
+      --badge-bg: #312e81;
+      --badge-text: #a5b4fc;
+      --user-tag-bg: #78350f;
+      --user-tag-text: #fef08a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 12px 48px;
+      transition: background-color 0.25s, color 0.25s;
+    }
+
+    header {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 0 4px;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .header-title span.highlight {
+      color: #f97316;
+    }
+
+    .header-title .author-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-left: 4px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text-main);
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-links {
+      display: flex;
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+
+    .section-link {
+      color: var(--text-muted);
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .section-link:hover {
+      color: var(--primary);
+    }
+
+    /* 메인 카테고리 그리드 */
+    .main-category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+      gap: 10px;
+    }
+
+    .cat-card-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 6px;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s;
+      gap: 6px;
+    }
+
+    .cat-card-btn .cat-icon {
+      font-size: 1.5rem;
+    }
+
+    .cat-card-btn .cat-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .cat-card-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+    }
+
+    /* 서브 탭 & 검색 컨트롤 */
+    .sub-tabs-container {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    .sub-tab-btn {
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      white-space: nowrap;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .sub-tab-btn.active {
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      border-color: var(--primary);
+    }
+
+    .controls-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .search-input {
+      flex: 1 1 180px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .control-btn-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .action-btn.add-btn {
+      background: rgba(16, 185, 129, 0.1);
+      color: #059669;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .action-btn.reset-btn {
+      background: rgba(225, 29, 72, 0.08);
+      color: var(--accent);
+      border-color: rgba(225, 29, 72, 0.3);
+    }
+
+    /* 품목 체크박스 카드 그리드 */
+    .item-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 8px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .item-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: var(--item-card-bg);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .item-card:hover {
+      border-color: var(--primary);
+    }
+
+    .item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .item-card input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .item-info {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .item-title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .item-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-badge {
+      font-size: 0.65rem;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: var(--user-tag-bg);
+      color: var(--user-tag-text);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .item-price {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .item-del-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 0.85rem;
+      cursor: pointer;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+
+    /* 룰렛 섹션 */
+    .roulette-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin-bottom: 20px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .pointer {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 26px solid var(--accent);
+      z-index: 10;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    .spin-btn {
+      width: 100%;
+      max-width: 320px;
+      padding: 16px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+    }
+
+    .spin-btn:disabled {
+      background: #64748b;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* 당첨 기록 */
+    .stats-summary {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--badge-text);
+      background: var(--badge-bg);
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+
+    .history-list {
+      max-height: 160px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      font-size: 0.85rem;
+    }
+
+    .history-item-name {
+      font-weight: 700;
+    }
+
+    .history-item-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .del-history-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+
+    /* 피드백 커뮤니티 섹션 */
+    .feedback-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .feedback-textarea {
+      width: 100%;
+      padding: 12px;
+      font-size: 0.85rem;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      resize: vertical;
+      min-height: 70px;
+      outline: none;
+    }
+
+    .feedback-bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feedback-pwd-input {
+      width: 130px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .feedback-submit-btn {
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .feedback-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .feedback-card {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .feedback-text {
+      font-size: 0.88rem;
+      word-break: break-all;
+      line-height: 1.4;
+    }
+
+    .feedback-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .feedback-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .like-btn {
+      background: none;
+      border: 1px solid var(--card-border);
+      padding: 4px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .like-btn.liked {
+      background: rgba(225, 29, 72, 0.1);
+      color: var(--accent);
+      border-color: rgba(225, 29, 72, 0.3);
+    }
+
+    .fb-action-sm {
+      background: none;
+      border: 1px solid var(--card-border);
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .reply-list {
+      margin-top: 6px;
+      padding-left: 10px;
+      border-left: 2px solid var(--primary);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .reply-item {
+      font-size: 0.8rem;
+      background: var(--card-bg);
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .reply-input-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .reply-input {
+      flex: 1;
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      border-radius: 6px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .reply-btn {
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 6px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      cursor: pointer;
+    }
+
+    /* 모달들 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal h2 {
+      font-size: 1.1rem;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      font-weight: 800;
+    }
+
+    .result-name {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 16px 0 22px;
+      word-break: keep-all;
+    }
+
+    .guide-content {
+      text-align: left;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .guide-step {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .guide-num {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px;
+      font-size: 0.9rem;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: var(--input-bg);
+      color: var(--text-main);
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    .modal-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .modal-btn {
+      padding: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .modal-btn.primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .modal-btn.secondary {
+      background: var(--input-bg);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-title">
+      🏪 <span>편의점</span> <span class="highlight">랜덤 룰렛</span>
+      <span class="author-tag">[made by. Yoonsung]</span>
+    </div>
+    <div class="header-right">
+      <button class="header-btn" id="helpBtn">❓ 사용법</button>
+      <button class="header-btn" id="themeToggleBtn">☀️ 라이트</button>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- 메인 카테고리 카드 -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">
+          <span>🥞 메인 카테고리 (한눈에 전체 선택)</span>
+        </div>
+        <div class="section-links">
+          <span class="section-link" id="globalSelectAllBtn">전체 선택</span>
+          <span style="color:var(--card-border)">|</span>
+          <span class="section-link" id="globalDeselectAllBtn">전체 해제</span>
+        </div>
+      </div>
+      <div class="main-category-grid" id="mainCatGrid"></div>
+    </div>
+
+    <!-- 품목 상세 카드 -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title" id="subCategoryHeaderTitle">
+          <span>🍙 품목 상세</span>
+        </div>
+        <div class="sub-tabs-container" id="subTabs"></div>
+      </div>
+
+      <div class="controls-row">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 품목 검색...">
+        <div class="control-btn-group">
+          <button id="addItemOpenModalBtn" class="action-btn add-btn">➕ 품목 직접 추가</button>
+          <button id="selectSubAllBtn" class="action-btn">현재 탭 전체선택</button>
+          <button id="deselectSubAllBtn" class="action-btn">현재 탭 해제</button>
+          <button id="resetAllBtn" class="action-btn reset-btn">🔄 품목 초기화</button>
+        </div>
+      </div>
+
+      <div class="item-card-grid" id="itemGrid"></div>
+    </div>
+
+    <!-- 룰렛 카드 -->
+    <div class="card roulette-container">
+      <div class="canvas-wrapper">
+        <div class="pointer"></div>
+        <canvas id="rouletteCanvas" width="500" height="500"></canvas>
+      </div>
+      <button id="spinBtn" class="spin-btn">🎯 룰렛 돌리기!</button>
+    </div>
+
+    <!-- 당첨 기록 카드 -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">🏆 당첨 기록 & 통계</div>
+        <span class="section-link" id="clearHistoryBtn">기록 비우기</span>
+      </div>
+      <div id="statsSummary" class="stats-summary">아직 당첨 기록이 없습니다.</div>
+      <div id="historyList" class="history-list"></div>
+    </div>
+
+    <!-- 유저 의견 및 피드백 커뮤니티 -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">💬 유저 의견 및 피드백</div>
+      </div>
+      <div class="feedback-form">
+        <textarea id="feedbackInput" class="feedback-textarea" placeholder="추가했으면 하는 메뉴나 의견을 남겨주세요!"></textarea>
+        <div class="feedback-bottom-row">
+          <input type="password" id="feedbackPwd" class="feedback-pwd-input" maxlength="4" placeholder="비밀번호 4자리">
+          <button id="submitFeedbackBtn" class="feedback-submit-btn">의견 등록</button>
+        </div>
+      </div>
+      <div class="feedback-list" id="feedbackList"></div>
+    </div>
+  </div>
+
+  <!-- 결과 모달 -->
+  <div class="modal-overlay" id="resultModal">
+    <div class="modal">
+      <h2>🎉 오늘의 선택!</h2>
+      <div class="result-name" id="resultText">-</div>
+      <div class="modal-btns">
+        <button id="closeModalBtn" class="modal-btn primary">확인</button>
+        <button id="excludeBtn" class="modal-btn secondary">제외하고 다시 돌리기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 품목 추가 모달 -->
+  <div class="modal-overlay" id="addItemModal">
+    <div class="modal">
+      <h2>➕ 새 품목 추가하기</h2>
+      <input type="text" id="newItemName" class="modal-input" placeholder="품목 이름 (예: 바나나우유)">
+      <input type="number" id="newItemPrice" class="modal-input" placeholder="가격 (예: 1800)">
+      <div class="modal-btns">
+        <button id="confirmAddItemBtn" class="modal-btn primary">추가하기</button>
+        <button id="closeAddItemBtn" class="modal-btn secondary">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 사용법 모달 -->
+  <div class="modal-overlay" id="helpModal">
+    <div class="modal">
+      <h2>💡 사용법 안내</h2>
+      <div class="guide-content">
+        <div class="guide-step">
+          <div class="guide-num">1</div>
+          <div><b>카테고리 & 품목 선택:</b> 원하는 편의점 메뉴 카테고리를 누르고 체크박스로 품목을 골라주세요.</div>
+        </div>
+        <div class="guide-step">
+          <div class="guide-num">2</div>
+          <div><b>품목 직접 추가:</b> '➕ 품목 직접 추가' 버튼으로 나만의 메뉴를 등록하면 모든 사용자에게 공유됩니다!</div>
+        </div>
+        <div class="guide-step">
+          <div class="guide-num">3</div>
+          <div><b>룰렛 돌리기:</b> 하단의 '🎯 룰렛 돌리기!' 버튼을 누르면 무작위로 메뉴가 추첨됩니다.</div>
+        </div>
+        <div class="guide-step">
+          <div class="guide-num">4</div>
+          <div><b>유저 커뮤니티:</b> 피드백 등록 시 4자리 비밀번호를 설정하여, 내 의견을 안전하게 수정·삭제할 수 있습니다.</div>
+        </div>
+      </div>
+      <button id="closeHelpBtn" class="modal-btn primary">알겠어요!</button>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      databaseURL: "https://food-98400-default-rtdb.firebaseio.com/"
+    };
+
+    let db = null;
+    let userCustomItems = {};
+    let feedbacks = {};
+
+    const DEFAULT_DATABASE = {
+      gimbap: {
+        name: "김밥",
+        icon: "🍙",
+        subCategories: { samgak: "삼각김밥", gimbap: "줄김밥" },
+        items: [
+          { name: "참치마요 삼각김밥", price: 1200, sub: "samgak" },
+          { name: "전주비빔 삼각김밥", price: 1200, sub: "samgak" },
+          { name: "스팸마요 삼각김밥", price: 1300, sub: "samgak" },
+          { name: "참치김밥", price: 2800, sub: "gimbap" },
+          { name: "돈까스김밥", price: 3000, sub: "gimbap" }
+        ]
+      },
+      ramen: {
+        name: "라면",
+        icon: "🍜",
+        subCategories: { soup: "국물 컵라면", stir: "볶음/비빔 컵라면" },
+        items: [
+          { name: "신라면 큰사발", price: 1400, sub: "soup" },
+          { name: "진라면 매운맛 컵", price: 1300, sub: "soup" },
+          { name: "육개장 사발면", price: 1100, sub: "soup" },
+          { name: "불닭볶음면 컵", price: 1500, sub: "stir" }
+        ]
+      },
+      bento: {
+        name: "도시락",
+        icon: "🍱",
+        subCategories: { bento: "도시락", cuprice: "컵밥" },
+        items: [
+          { name: "혜자로운 집밥 제육", price: 4500, sub: "bento" },
+          { name: "백종원 매콤불고기", price: 4700, sub: "bento" },
+          { name: "치킨마요 도시락", price: 4300, sub: "bento" }
+        ]
+      },
+      anju: {
+        name: "안주",
+        icon: "🍢",
+        subCategories: { bar: "핫바/소시지", cold: "냉동/안주류" },
+        items: [
+          { name: "의성마늘 핫바", price: 2200, sub: "bar" },
+          { name: "비비고 왕교자", price: 3900, sub: "cold" },
+          { name: "불막창", price: 7900, sub: "cold" }
+        ]
+      },
+      drink: {
+        name: "음료",
+        icon: "🥤",
+        subCategories: { coffee: "커피", soda: "탄산/이온" },
+        items: [
+          { name: "코카콜라 Zero", price: 2000, sub: "soda" },
+          { name: "포카리스웨트", price: 1600, sub: "soda" },
+          { name: "TOP 아메리카노", price: 2200, sub: "coffee" }
+        ]
+      },
+      snack: {
+        name: "스낵",
+        icon: "🍪",
+        subCategories: { chip: "감자칩/스낵", choco: "초코/비스킷" },
+        items: [
+          { name: "포카칩 오리지널", price: 1700, sub: "chip" },
+          { name: "허니버터칩", price: 1700, sub: "chip" },
+          { name: "홈런볼", price: 1700, sub: "choco" }
+        ]
+      },
+      dessert: {
+        name: "디저트",
+        icon: "🍦",
+        subCategories: { ice: "아이스크림", bakery: "베이커리" },
+        items: [
+          { name: "메로나", price: 1200, sub: "ice" },
+          { name: "연세우유 생크림빵", price: 2800, sub: "bakery" }
+        ]
+      },
+      alcohol: {
+        name: "주류",
+        icon: "🍺",
+        subCategories: { beer: "맥주", soju: "소주/하이볼" },
+        items: [
+          { name: "카스 500ml 캔", price: 2800, sub: "beer" },
+          { name: "참이슬 후레쉬", price: 1950, sub: "soju" }
+        ]
+      },
+      tobacco: {
+        name: "담배",
+        icon: "🚬",
+        subCategories: { comb: "연초", heated: "궐연형" },
+        items: [
+          { name: "에쎄 체인지 1mg", price: 4500, sub: "comb" },
+          { name: "테리아 앰버", price: 4800, sub: "heated" }
+        ]
+      }
+    };
+
+    const COLORS = ["#6366f1", "#10b981", "#f59e0b", "#f43f5e", "#8b5cf6", "#ec4899", "#06b6d4", "#84cc16"];
+
+    let currentCatKey = "gimbap";
+    let currentSubTab = "all";
+    let selectedItems = new Set();
+    let isSpinning = false;
+    let currentRotation = 0;
+    let audioCtx = null;
+    let historyRecords = [];
+
+    const canvas = document.getElementById("rouletteCanvas");
+    const ctx = canvas.getContext("2d");
+    const spinBtn = document.getElementById("spinBtn");
+    const mainCatGrid = document.getElementById("mainCatGrid");
+    const subTabsContainer = document.getElementById("subTabs");
+    const itemGridContainer = document.getElementById("itemGrid");
+    const searchInput = document.getElementById("searchInput");
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    const helpBtn = document.getElementById("helpBtn");
+    const subCategoryHeaderTitle = document.getElementById("subCategoryHeaderTitle");
+    const resultModal = document.getElementById("resultModal");
+    const helpModal = document.getElementById("helpModal");
+    const addItemModal = document.getElementById("addItemModal");
+    const resultText = document.getElementById("resultText");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const closeHelpBtn = document.getElementById("closeHelpBtn");
+    const excludeBtn = document.getElementById("excludeBtn");
+    const historyListContainer = document.getElementById("historyList");
+    const statsSummary = document.getElementById("statsSummary");
+    const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+    const addItemOpenModalBtn = document.getElementById("addItemOpenModalBtn");
+    const confirmAddItemBtn = document.getElementById("confirmAddItemBtn");
+    const closeAddItemBtn = document.getElementById("closeAddItemBtn");
+    const newItemNameInput = document.getElementById("newItemName");
+    const newItemPriceInput = document.getElementById("newItemPrice");
+    const feedbackInput = document.getElementById("feedbackInput");
+    const feedbackPwdInput = document.getElementById("feedbackPwd");
+    const submitFeedbackBtn = document.getElementById("submitFeedbackBtn");
+    const feedbackListContainer = document.getElementById("feedbackList");
+
+    let lastWinItemName = "";
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem("theme") || "light";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      updateThemeBtnText(savedTheme);
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+      const newTheme = currentTheme === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+      updateThemeBtnText(newTheme);
+      drawRoulette();
+    }
+
+    function updateThemeBtnText(theme) {
+      themeToggleBtn.textContent = theme === "dark" ? "🌙 다크" : "☀️ 라이트";
+    }
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function playTickSound() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.04);
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.04);
+    }
+
+    function playWinSound() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+        gain.gain.setValueAtTime(0.2, now + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 0.3);
+      });
+    }
+
+    function initFirebaseAndApp() {
+      try {
+        const { initializeApp, getDatabase, ref, onValue } = window.firebaseModules;
+        const app = initializeApp(firebaseConfig);
+        db = getDatabase(app);
+
+        const itemsRef = ref(db, 'customItems');
+        onValue(itemsRef, (snapshot) => {
+          userCustomItems = snapshot.val() || {};
+          renderItems();
+        });
+
+        const feedbackRef = ref(db, 'feedbacks');
+        onValue(feedbackRef, (snapshot) => {
+          feedbacks = snapshot.val() || {};
+          renderFeedbacks();
+        });
+      } catch (e) {
+        console.warn("Firebase 로드 실패, 로컬 모드로 동작합니다.", e);
+      }
+
+      initTheme();
+      renderMainCategories();
+      
+      Object.keys(DEFAULT_DATABASE).forEach(catKey => {
+        DEFAULT_DATABASE[catKey].items.forEach(item => selectedItems.add(item.name));
+      });
+
+      switchCategory("gimbap");
+      loadHistory();
+
+      themeToggleBtn.addEventListener("click", toggleTheme);
+      helpBtn.addEventListener("click", () => helpModal.classList.add("active"));
+      closeHelpBtn.addEventListener("click", () => helpModal.classList.remove("active"));
+      addItemOpenModalBtn.addEventListener("click", () => addItemModal.classList.add("active"));
+      closeAddItemBtn.addEventListener("click", () => addItemModal.classList.remove("active"));
+      confirmAddItemBtn.addEventListener("click", addNewCustomItem);
+      submitFeedbackBtn.addEventListener("click", submitFeedback);
+
+      document.getElementById("globalSelectAllBtn").addEventListener("click", globalSelectAll);
+      document.getElementById("globalDeselectAllBtn").addEventListener("click", globalDeselectAll);
+      document.getElementById("selectSubAllBtn").addEventListener("click", selectSubAll);
+      document.getElementById("deselectSubAllBtn").addEventListener("click", deselectSubAll);
+      document.getElementById("resetAllBtn").addEventListener("click", resetAll);
+      searchInput.addEventListener("input", renderItems);
+      spinBtn.addEventListener("click", spinRoulette);
+      closeModalBtn.addEventListener("click", () => resultModal.classList.remove("active"));
+      excludeBtn.addEventListener("click", excludeLastItemAndSpin);
+      clearHistoryBtn.addEventListener("click", clearHistory);
+    }
+
+    function renderMainCategories() {
+      mainCatGrid.innerHTML = "";
+      Object.keys(DEFAULT_DATABASE).forEach(key => {
+        const cat = DEFAULT_DATABASE[key];
+        const btn = document.createElement("button");
+        btn.className = `cat-card-btn ${key === currentCatKey ? "active" : ""}`;
+        btn.innerHTML = `<span class="cat-icon">${cat.icon}</span><span class="cat-name">${cat.name}</span>`;
+        btn.addEventListener("click", () => switchCategory(key));
+        mainCatGrid.appendChild(btn);
+      });
+    }
+
+    function switchCategory(key) {
+      currentCatKey = key;
+      currentSubTab = "all";
+
+      Array.from(mainCatGrid.children).forEach((btn, idx) => {
+        btn.classList.toggle("active", Object.keys(DEFAULT_DATABASE)[idx] === key);
+      });
+
+      const cat = DEFAULT_DATABASE[key];
+      subCategoryHeaderTitle.innerHTML = `<span>${cat.icon} ${cat.name} 품목 상세</span>`;
+
+      renderSubTabs();
+      renderItems();
+    }
+
+    function renderSubTabs() {
+      subTabsContainer.innerHTML = "";
+      const cat = DEFAULT_DATABASE[currentCatKey];
+
+      const allBtn = document.createElement("button");
+      allBtn.className = `sub-tab-btn ${currentSubTab === "all" ? "active" : ""}`;
+      allBtn.textContent = "전체";
+      allBtn.addEventListener("click", () => switchSubTab("all"));
+      subTabsContainer.appendChild(allBtn);
+
+      Object.keys(cat.subCategories).forEach(subKey => {
+        const btn = document.createElement("button");
+        btn.className = `sub-tab-btn ${currentSubTab === subKey ? "active" : ""}`;
+        btn.textContent = cat.subCategories[subKey];
+        btn.addEventListener("click", () => switchSubTab(subKey));
+        subTabsContainer.appendChild(btn);
+      });
+    }
+
+    function switchSubTab(subKey) {
+      currentSubTab = subKey;
+      Array.from(subTabsContainer.children).forEach(btn => {
+        btn.classList.toggle("active", btn.textContent === (subKey === "all" ? "전체" : DEFAULT_DATABASE[currentCatKey].subCategories[subKey]));
+      });
+      renderItems();
+    }
+
+    function getAllItemsForCategory(catKey) {
+      const defaultItems = DEFAULT_DATABASE[catKey].items.map(i => ({ ...i, isUser: false }));
+      const customObj = (userCustomItems[catKey] || {});
+      const customItems = Object.keys(customObj).map(id => ({
+        id: id,
+        name: customObj[id].name,
+        price: customObj[id].price,
+        sub: customObj[id].sub,
+        isUser: true
+      }));
+      return [...defaultItems, ...customItems];
+    }
+
+    function renderItems() {
+      itemGridContainer.innerHTML = "";
+      const keyword = searchInput.value.trim().toLowerCase();
+      const allCategoryItems = getAllItemsForCategory(currentCatKey);
+
+      const filtered = allCategoryItems.filter(item => {
+        const matchesSub = (currentSubTab === "all" || item.sub === currentSubTab);
+        const matchesSearch = item.name.toLowerCase().includes(keyword);
+        return matchesSub && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        itemGridContainer.innerHTML = `<div style="grid-column: 1/-1; text-align:center; color:var(--text-muted); padding:20px; font-size:0.85rem;">해당 조건의 품목이 없습니다.</div>`;
+        drawRoulette();
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "item-card";
+
+        const leftDiv = document.createElement("div");
+        leftDiv.className = "item-left";
+        leftDiv.style.cursor = "pointer";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = selectedItems.has(item.name);
+        checkbox.addEventListener("change", (e) => {
+          if (e.target.checked) selectedItems.add(item.name);
+          else selectedItems.delete(item.name);
+          drawRoulette();
+        });
+
+        const info = document.createElement("div");
+        info.className = "item-info";
+        
+        let userBadgeHtml = item.isUser ? `<span class="user-badge">👤 유저</span>` : '';
+        info.innerHTML = `
+          <div class="item-title-row">
+            <span class="item-title">${item.name}</span>
+            ${userBadgeHtml}
+          </div>
+          <span class="item-price">${Number(item.price).toLocaleString()}원</span>
+        `;
+
+        leftDiv.appendChild(checkbox);
+        leftDiv.appendChild(info);
+        leftDiv.addEventListener("click", (e) => {
+          if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change'));
+          }
+        });
+
+        card.appendChild(leftDiv);
+
+        if (item.isUser) {
+          const delBtn = document.createElement("button");
+          delBtn.className = "item-del-btn";
+          delBtn.textContent = "✕";
+          delBtn.title = "유저 추가 품목 삭제";
+          delBtn.addEventListener("click", () => deleteCustomItem(currentCatKey, item.id, item.name));
+          card.appendChild(delBtn);
+        }
+
+        itemGridContainer.appendChild(card);
+      });
+
+      drawRoulette();
+    }
+
+    function addNewCustomItem() {
+      const name = newItemNameInput.value.trim();
+      const price = Number(newItemPriceInput.value);
+
+      if (!name) {
+        alert("품목 이름을 입력해주세요.");
+        return;
+      }
+      if (!price || price <= 0) {
+        alert("올바른 가격을 입력해주세요.");
+        return;
+      }
+
+      const subKey = currentSubTab === "all" ? Object.keys(DEFAULT_DATABASE[currentCatKey].subCategories)[0] : currentSubTab;
+
+      if (db) {
+        const { ref, push, set } = window.firebaseModules;
+        const newRef = push(ref(db, `customItems/${currentCatKey}`));
+        set(newRef, { name, price, sub: subKey }).then(() => {
+          selectedItems.add(name);
+          newItemNameInput.value = "";
+          newItemPriceInput.value = "";
+          addItemModal.classList.remove("active");
+        });
+      } else {
+        if (!userCustomItems[currentCatKey]) userCustomItems[currentCatKey] = {};
+        const fakeId = 'local_' + Date.now();
+        userCustomItems[currentCatKey][fakeId] = { name, price, sub: subKey };
+        selectedItems.add(name);
+        newItemNameInput.value = "";
+        newItemPriceInput.value = "";
+        addItemModal.classList.remove("active");
+        renderItems();
+      }
+    }
+
+    function deleteCustomItem(catKey, itemId, itemName) {
+      if (confirm(`'${itemName}' 품목을 삭제하시겠습니까?`)) {
+        selectedItems.delete(itemName);
+        if (db) {
+          const { ref, remove } = window.firebaseModules;
+          remove(ref(db, `customItems/${catKey}/${itemId}`));
+        } else {
+          delete userCustomItems[catKey][itemId];
+          renderItems();
+        }
+      }
+    }
+
+    function globalSelectAll() {
+      Object.keys(DEFAULT_DATABASE).forEach(catKey => {
+        DEFAULT_DATABASE[catKey].items.forEach(item => selectedItems.add(item.name));
+        const customObj = userCustomItems[catKey] || {};
+        Object.values(customObj).forEach(item => selectedItems.add(item.name));
+      });
+      renderItems();
+    }
+
+    function globalDeselectAll() {
+      selectedItems.clear();
+      renderItems();
+    }
+
+    function selectSubAll() {
+      const allItems = getAllItemsForCategory(currentCatKey);
+      allItems.forEach(item => {
+        if (currentSubTab === "all" || item.sub === currentSubTab) {
+          selectedItems.add(item.name);
+        }
+      });
+      renderItems();
+    }
+
+    function deselectSubAll() {
+      const allItems = getAllItemsForCategory(currentCatKey);
+      allItems.forEach(item => {
+        if (currentSubTab === "all" || item.sub === currentSubTab) {
+          selectedItems.delete(item.name);
+        }
+      });
+      renderItems();
+    }
+
+    function resetAll() {
+      selectedItems.clear();
+      renderItems();
+    }
+
+    function getAllActiveItems() {
+      let active = [];
+      Object.keys(DEFAULT_DATABASE).forEach(catKey => {
+        DEFAULT_DATABASE[catKey].items.forEach(item => {
+          if (selectedItems.has(item.name)) active.push(item);
+        });
+        const customObj = userCustomItems[catKey] || {};
+        Object.values(customObj).forEach(item => {
+          if (selectedItems.has(item.name)) active.push(item);
+        });
+      });
+      return active;
+    }
+
+    function drawRoulette() {
+      const items = getAllActiveItems();
+      const numSlices = items.length;
+      const width = canvas.width;
+      const height = canvas.height;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const radius = width / 2 - 15;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+
+      if (numSlices === 0) {
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.fillStyle = isDark ? "#334155" : "#e2e8f0";
+        ctx.fill();
+        ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+        ctx.font = "bold 20px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("품목을 선택해주세요", centerX, centerY);
+        spinBtn.disabled = true;
+        return;
+      }
+
+      spinBtn.disabled = isSpinning;
+
+      const sliceAngle = (Math.PI * 2) / numSlices;
+
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(currentRotation);
+
+      for (let i = 0; i < numSlices; i++) {
+        const startAngle = i * sliceAngle;
+        const endAngle = startAngle + sliceAngle;
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = COLORS[i % COLORS.length];
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = isDark ? "#1e293b" : "#ffffff";
+        ctx.stroke();
+
+        ctx.save();
+        ctx.rotate(startAngle + sliceAngle / 2);
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#FFFFFF";
+
+        let fontSize = 20;
+        if (numSlices > 12) fontSize = 15;
+        if (numSlices > 24) fontSize = 10;
+        ctx.font = `bold ${fontSize}px sans-serif`;
+
+        let text = items[i].name;
+        if (text.length > 9 && numSlices > 10) text = text.substring(0, 8) + "..";
+
+        ctx.fillText(text, radius - 25, 0);
+        ctx.restore();
+      }
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 28, 0, Math.PI * 2);
+      ctx.fillStyle = isDark ? "#1e293b" : "#ffffff";
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "#4f46e5";
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function spinRoulette() {
+      const items = getAllActiveItems();
+      if (items.length === 0 || isSpinning) return;
+
+      initAudio();
+      isSpinning = true;
+      spinBtn.disabled = true;
+
+      const numSlices = items.length;
+      const sliceAngle = (Math.PI * 2) / numSlices;
+
+      const winIndex = Math.floor(Math.random() * numSlices);
+      const extraSpins = (Math.floor(Math.random() * 4) + 5) * (Math.PI * 2);
+
+      const targetSliceOffset = (winIndex + 0.5) * sliceAngle;
+      const targetRotation = currentRotation + extraSpins + (Math.PI * 1.5 - (currentRotation + extraSpins + targetSliceOffset) % (Math.PI * 2));
+
+      const startTime = performance.now();
+      const duration = 4500;
+      const startRotation = currentRotation;
+      let lastTickSlice = -1;
+
+      function animate(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        currentRotation = startRotation + (targetRotation - startRotation) * easeOut;
+
+        const currentNormalizedRotation = (currentRotation) % (Math.PI * 2);
+        const currentSliceUnderPointer = Math.floor(
+          ((Math.PI * 1.5 - currentNormalizedRotation + Math.PI * 4) % (Math.PI * 2)) / sliceAngle
+        );
+
+        if (currentSliceUnderPointer !== lastTickSlice) {
+          playTickSound();
+          lastTickSlice = currentSliceUnderPointer;
+        }
+
+        drawRoulette();
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          isSpinning = false;
+          spinBtn.disabled = false;
+
+          lastWinItemName = items[winIndex].name;
+          addHistoryRecord(lastWinItemName);
+          showResultModal(lastWinItemName);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function showResultModal(itemName) {
+      playWinSound();
+      resultText.textContent = itemName;
+      resultModal.classList.add("active");
+
+      if (typeof confetti === "function") {
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+      }
+    }
+
+    function excludeLastItemAndSpin() {
+      resultModal.classList.remove("active");
+      if (lastWinItemName) {
+        selectedItems.delete(lastWinItemName);
+        renderItems();
+        setTimeout(() => spinRoulette(), 300);
+      }
+    }
+
+    function loadHistory() {
+      const saved = localStorage.getItem("rouletteHistory");
+      if (saved) {
+        try { historyRecords = JSON.parse(saved); } catch (e) { historyRecords = []; }
+      }
+      renderHistory();
+    }
+
+    function saveHistory() {
+      localStorage.setItem("rouletteHistory", JSON.stringify(historyRecords));
+    }
+
+    function addHistoryRecord(itemName) {
+      const now = new Date();
+      const timeStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      historyRecords.unshift({ id: Date.now(), name: itemName, time: timeStr });
+      saveHistory();
+      renderHistory();
+    }
+
+    function deleteHistoryRecord(id) {
+      historyRecords = historyRecords.filter(r => r.id !== id);
+      saveHistory();
+      renderHistory();
+    }
+
+    function clearHistory() {
+      if (historyRecords.length === 0) return;
+      if (confirm("당첨 기록을 모두 비우시겠습니까?")) {
+        historyRecords = [];
+        saveHistory();
+        renderHistory();
+      }
+    }
+
+    function renderHistory() {
+      historyListContainer.innerHTML = "";
+
+      if (historyRecords.length === 0) {
+        statsSummary.textContent = "아직 당첨 기록이 없습니다.";
+        return;
+      }
+
+      const counts = {};
+      historyRecords.forEach(r => counts[r.name] = (counts[r.name] || 0) + 1);
+
+      let topItem = "";
+      let maxCount = 0;
+      Object.keys(counts).forEach(name => {
+        if (counts[name] > maxCount) {
+          maxCount = counts[name];
+          topItem = name;
+        }
+      });
+
+      statsSummary.textContent = `총 ${historyRecords.length}회 돌림 | 최다 당첨: ${topItem} (${maxCount}회)`;
+
+      historyRecords.forEach(r => {
+        const itemEl = document.createElement("div");
+        itemEl.className = "history-item";
+
+        const infoSpan = document.createElement("span");
+        infoSpan.className = "history-item-name";
+        infoSpan.textContent = r.name;
+
+        const rightDiv = document.createElement("div");
+        const timeSpan = document.createElement("span");
+        timeSpan.className = "history-item-time";
+        timeSpan.textContent = r.time;
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "del-history-btn";
+        delBtn.textContent = "✕";
+        delBtn.addEventListener("click", () => deleteHistoryRecord(r.id));
+
+        rightDiv.appendChild(timeSpan);
+        rightDiv.appendChild(delBtn);
+        itemEl.appendChild(infoSpan);
+        itemEl.appendChild(rightDiv);
+
+        historyListContainer.appendChild(itemEl);
+      });
+    }
+
+    // === 피드백 커뮤니티 기능 (비밀번호 인증 포함) ===
+    function submitFeedback() {
+      const text = feedbackInput.value.trim();
+      const pwd = feedbackPwdInput.value.trim();
+
+      if (!text) {
+        alert("의견 내용을 입력해주세요.");
+        return;
+      }
+      if (!pwd || pwd.length !== 4) {
+        alert("수정/삭제용 4자리 비밀번호를 입력해주세요.");
+        return;
+      }
+
+      const now = new Date();
+      const timeStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      if (db) {
+        const { ref, push, set } = window.firebaseModules;
+        const newRef = push(ref(db, 'feedbacks'));
+        set(newRef, { text, pwd, time: timeStr, likes: 0, replies: {} }).then(() => {
+          feedbackInput.value = "";
+          feedbackPwdInput.value = "";
+        });
+      } else {
+        const fakeId = 'fb_' + Date.now();
+        feedbacks[fakeId] = { text, pwd, time: timeStr, likes: 0, replies: {} };
+        feedbackInput.value = "";
+        feedbackPwdInput.value = "";
+        renderFeedbacks();
+      }
+    }
+
+    function toggleLike(fbId) {
+      let likedSet = JSON.parse(localStorage.getItem("likedFeedbacks") || "{}");
+      const currentLikes = feedbacks[fbId].likes || 0;
+
+      if (db) {
+        const { ref, update } = window.firebaseModules;
+        if (likedSet[fbId]) {
+          delete likedSet[fbId];
+          update(ref(db, `feedbacks/${fbId}`), { likes: Math.max(0, currentLikes - 1) });
+        } else {
+          likedSet[fbId] = true;
+          update(ref(db, `feedbacks/${fbId}`), { likes: currentLikes + 1 });
+        }
+      } else {
+        if (likedSet[fbId]) {
+          delete likedSet[fbId];
+          feedbacks[fbId].likes = Math.max(0, currentLikes - 1);
+        } else {
+          likedSet[fbId] = true;
+          feedbacks[fbId].likes = currentLikes + 1;
+        }
+        renderFeedbacks();
+      }
+      localStorage.setItem("likedFeedbacks", JSON.stringify(likedSet));
+    }
+
+    function editFeedback(fbId) {
+      const inputPwd = prompt("등록 시 입력한 4자리 비밀번호를 입력하세요:");
+      if (!inputPwd) return;
+
+      if (inputPwd !== feedbacks[fbId].pwd) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return;
+      }
+
+      const newText = prompt("수정할 의견 내용을 입력하세요:", feedbacks[fbId].text);
+      if (newText === null || !newText.trim()) return;
+
+      if (db) {
+        const { ref, update } = window.firebaseModules;
+        update(ref(db, `feedbacks/${fbId}`), { text: newText.trim() });
+      } else {
+        feedbacks[fbId].text = newText.trim();
+        renderFeedbacks();
+      }
+    }
+
+    function deleteFeedback(fbId) {
+      const inputPwd = prompt("등록 시 입력한 4자리 비밀번호를 입력하세요:");
+      if (!inputPwd) return;
+
+      if (inputPwd !== feedbacks[fbId].pwd) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return;
+      }
+
+      if (confirm("정말 이 의견을 삭제하시겠습니까?")) {
+        if (db) {
+          const { ref, remove } = window.firebaseModules;
+          remove(ref(db, `feedbacks/${fbId}`));
+        } else {
+          delete feedbacks[fbId];
+          renderFeedbacks();
+        }
+      }
+    }
+
+    function addReply(fbId, replyText) {
+      if (!replyText.trim()) return;
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      if (db) {
+        const { ref, push, set } = window.firebaseModules;
+        const newRef = push(ref(db, `feedbacks/${fbId}/replies`));
+        set(newRef, { text: replyText, time: timeStr });
+      } else {
+        if (!feedbacks[fbId].replies) feedbacks[fbId].replies = {};
+        const fakeRId = 'rep_' + Date.now();
+        feedbacks[fbId].replies[fakeRId] = { text: replyText, time: timeStr };
+        renderFeedbacks();
+      }
+    }
+
+    function renderFeedbacks() {
+      feedbackListContainer.innerHTML = "";
+      const fbKeys = Object.keys(feedbacks);
+
+      if (fbKeys.length === 0) {
+        feedbackListContainer.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:16px; font-size:0.82rem;">등록된 유저 의견이 없습니다. 첫 의견을 남겨보세요!</div>`;
+        return;
+      }
+
+      let likedSet = JSON.parse(localStorage.getItem("likedFeedbacks") || "{}");
+
+      fbKeys.reverse().forEach(fbId => {
+        const fb = feedbacks[fbId];
+        const card = document.createElement("div");
+        card.className = "feedback-card";
+
+        const textEl = document.createElement("div");
+        textEl.className = "feedback-text";
+        textEl.textContent = fb.text;
+
+        const footer = document.createElement("div");
+        footer.className = "feedback-footer";
+
+        const timeSpan = document.createElement("span");
+        timeSpan.textContent = fb.time;
+
+        const actions = document.createElement("div");
+        actions.className = "feedback-actions";
+
+        const likeBtn = document.createElement("button");
+        const isLiked = likedSet[fbId] ? "liked" : "";
+        likeBtn.className = `like-btn ${isLiked}`;
+        likeBtn.innerHTML = `❤️ 공감 <span>${fb.likes || 0}</span>`;
+        likeBtn.addEventListener("click", () => toggleLike(fbId));
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "fb-action-sm";
+        editBtn.textContent = "수정";
+        editBtn.addEventListener("click", () => editFeedback(fbId));
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "fb-action-sm";
+        delBtn.textContent = "삭제";
+        delBtn.addEventListener("click", () => deleteFeedback(fbId));
+
+        actions.appendChild(likeBtn);
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+
+        footer.appendChild(timeSpan);
+        footer.appendChild(actions);
+
+        card.appendChild(textEl);
+        card.appendChild(footer);
+
+        const replyContainer = document.createElement("div");
+        if (fb.replies) {
+          const rList = document.createElement("div");
+          rList.className = "reply-list";
+          Object.values(fb.replies).forEach(rep => {
+            const rItem = document.createElement("div");
+            rItem.className = "reply-item";
+            rItem.innerHTML = `<span>💬 ${rep.text}</span><span style="font-size:0.7rem; color:var(--text-muted);">${rep.time}</span>`;
+            rList.appendChild(rItem);
+          });
+          replyContainer.appendChild(rList);
+        }
+
+        const replyInputRow = document.createElement("div");
+        replyInputRow.className = "reply-input-row";
+        const replyInput = document.createElement("input");
+        replyInput.type = "text";
+        replyInput.className = "reply-input";
+        replyInput.placeholder = "추가 의견 답글 남기기...";
+        const replyBtn = document.createElement("button");
+        replyBtn.className = "reply-btn";
+        replyBtn.textContent = "등록";
+        replyBtn.addEventListener("click", () => {
+          addReply(fbId, replyInput.value);
+          replyInput.value = "";
+        });
+
+        replyInputRow.appendChild(replyInput);
+        replyInputRow.appendChild(replyBtn);
+        card.appendChild(replyContainer);
+        card.appendChild(replyInputRow);
+
+        feedbackListContainer.appendChild(card);
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", initFirebaseAndApp);
+  </script>
+</body>
+</html>
