@@ -73,14 +73,18 @@
       align-items: center;
       margin-bottom: 12px;
       padding: 0 4px;
+      gap: 8px;
     }
 
     .header-title {
       display: flex;
-      align-items: baseline;
-      gap: 4px;
-      font-size: 1.1rem;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.98rem;
       font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .header-title span.highlight {
@@ -88,7 +92,7 @@
     }
 
     .header-title .author-tag {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 600;
       color: var(--text-muted);
       margin-left: 2px;
@@ -97,19 +101,21 @@
     .header-right {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
+      flex-shrink: 0;
     }
 
     .header-btn {
-      padding: 5px 10px;
-      font-size: 0.75rem;
+      padding: 4px 8px;
+      font-size: 0.7rem;
       font-weight: 700;
-      border-radius: 16px;
+      border-radius: 12px;
       border: 1px solid var(--card-border);
       background: var(--card-bg);
       color: var(--text-main);
       cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      white-space: nowrap;
     }
 
     .app-container {
@@ -746,11 +752,11 @@
   <header>
     <div class="header-title">
       🏪 <span>편의점</span> <span class="highlight">랜덤 룰렛</span>
-      <span class="author-tag">[made by. Yoonsung]</span>
+      <span class="author-tag">[Yoonsung]</span>
     </div>
     <div class="header-right">
-      <button class="header-btn" id="helpBtn">❓ 사용법</button>
-      <button class="header-btn" id="themeToggleBtn">☀️ 라이트</button>
+      <button class="header-btn" id="helpBtn">사용법</button>
+      <button class="header-btn" id="themeToggleBtn">라이트</button>
     </div>
   </header>
 
@@ -759,7 +765,7 @@
     <div class="card">
       <div class="section-header">
         <div class="section-title">
-          <span>🥞 메인 카테고리 (선택 시 룰렛 전환)</span>
+          <span>🥞 메인 카테고리 (선택 시 해당 품목들로 룰렛 초기화/전환)</span>
         </div>
         <div class="section-links">
           <span class="section-link" id="globalSelectAllBtn">전체 선택</span>
@@ -888,17 +894,26 @@
     let feedbacks = {};
     let historyRecords = [];
 
+    // 전국의 편의점 인기 베스트 메뉴 대거 확장 수록 데이터베이스
     const DEFAULT_DATABASE = {
       gimbap: {
         name: "김밥",
         icon: "🍙",
-        subCategories: { samgak: "삼각김밥", gimbap: "줄김밥" },
+        subCategories: { samgak: "삼각김밥", gimbap: "줄김밥/기타" },
         items: [
           { name: "참치마요 삼각김밥", price: 1200, sub: "samgak" },
           { name: "전주비빔 삼각김밥", price: 1200, sub: "samgak" },
           { name: "스팸마요 삼각김밥", price: 1300, sub: "samgak" },
-          { name: "참치김밥", price: 2800, sub: "gimbap" },
-          { name: "돈까스김밥", price: 3000, sub: "gimbap" }
+          { name: "더블치즈 스팸 삼각김밥", price: 1400, sub: "samgak" },
+          { name: "참치김치볶음밥 삼각김밥", price: 1300, sub: "samgak" },
+          { name: "불닭마요 삼각김밥", price: 1400, sub: "samgak" },
+          { name: "소고기 고추장 삼각김밥", price: 1300, sub: "samgak" },
+          { name: "참치김밥", price: 2900, sub: "gimbap" },
+          { name: "돈까스김밥", price: 3200, sub: "gimbap" },
+          { name: "치즈김밥", price: 3000, sub: "gimbap" },
+          { name: "매콤제육 김밥", price: 3500, sub: "gimbap" },
+          { name: "스팸 계란 듬뿍 김밥", price: 3800, sub: "gimbap" },
+          { name: "계란사라다 샌드김밥", price: 3200, sub: "gimbap" }
         ]
       },
       ramen: {
@@ -906,20 +921,36 @@
         icon: "🍜",
         subCategories: { soup: "국물 컵라면", stir: "볶음/비빔 컵라면" },
         items: [
-          { name: "신라면 큰사발", price: 1400, sub: "soup" },
-          { name: "진라면 매운맛 컵", price: 1300, sub: "soup" },
-          { name: "육개장 사발면", price: 1100, sub: "soup" },
-          { name: "불닭볶음면 컵", price: 1500, sub: "stir" }
+          { name: "신라면 큰사발", price: 1500, sub: "soup" },
+          { name: "진라면 매운맛 컵", price: 1400, sub: "soup" },
+          { name: "육개장 사발면", price: 1200, sub: "soup" },
+          { name: "참깨라면 컵", price: 1600, sub: "soup" },
+          { name: "열라면 큰사발", price: 1500, sub: "soup" },
+          { name: "안성탕면 큰사발", price: 1400, sub: "soup" },
+          { name: "튀김우동 컵", price: 1200, sub: "soup" },
+          { name: "오동통면 컵", price: 1500, sub: "soup" },
+          { name: "불닭볶음면 컵", price: 1700, sub: "stir" },
+          { name: "까르보 불닭볶음면", price: 1700, sub: "stir" },
+          { name: "짜파게티 컵", price: 1500, sub: "stir" },
+          { name: "간짬뽕", price: 1600, sub: "stir" },
+          { name: "팔도 비빔면 컵", price: 1600, sub: "stir" },
+          { name: "로제 불닭볶음면", price: 1800, sub: "stir" }
         ]
       },
       bento: {
         name: "도시락",
         icon: "🍱",
-        subCategories: { bento: "도시락", cuprice: "컵밥" },
+        subCategories: { bento: "도시락", cuprice: "덮밥/간편식" },
         items: [
-          { name: "혜자로운 집밥 제육", price: 4500, sub: "bento" },
-          { name: "백종원 매콤불고기", price: 4700, sub: "bento" },
-          { name: "치킨마요 도시락", price: 4300, sub: "bento" }
+          { name: "혜자로운 집밥 제육", price: 4900, sub: "bento" },
+          { name: "백종원 매콤불고기", price: 4800, sub: "bento" },
+          { name: "맛장우 정식 도시락", price: 5200, sub: "bento" },
+          { name: "치킨마요 도시락", price: 4500, sub: "bento" },
+          { name: "소시지 에그 햄버그 도시락", price: 4700, sub: "bento" },
+          { name: "스팸 김치볶음밥", price: 4200, sub: "cuprice" },
+          { name: "불닭마요 덮밥", price: 4500, sub: "cuprice" },
+          { name: "치즈 오븐 스파게티", price: 4300, sub: "cuprice" },
+          { name: "자이언트 떡볶이", price: 3800, sub: "cuprice" }
         ]
       },
       anju: {
@@ -927,9 +958,16 @@
         icon: "🍢",
         subCategories: { bar: "핫바/소시지", cold: "냉동/안주류" },
         items: [
-          { name: "의성마늘 핫바", price: 2200, sub: "bar" },
-          { name: "비비고 왕교자", price: 3900, sub: "cold" },
-          { name: "불막창", price: 7900, sub: "cold" }
+          { name: "의성마늘 핫바", price: 2300, sub: "bar" },
+          { name: "매콤 빅통살 닭다리", price: 2800, sub: "bar" },
+          { name: "치즈 닭가슴살 핫바", price: 2500, sub: "bar" },
+          { name: "숯불향 프랑크 소시지", price: 2400, sub: "bar" },
+          { name: "비비고 왕교자", price: 4200, sub: "cold" },
+          { name: "직화 불막창", price: 7900, sub: "cold" },
+          { name: "매콤 닭발", price: 7500, sub: "cold" },
+          { name: "모둠 소시지 구이", price: 4500, sub: "cold" },
+          { name: "먹태구이 & 마요소스", price: 4900, sub: "cold" },
+          { name: "콘치즈 그라탕", price: 3900, sub: "cold" }
         ]
       },
       drink: {
@@ -938,8 +976,15 @@
         subCategories: { coffee: "커피", soda: "탄산/이온" },
         items: [
           { name: "코카콜라 Zero", price: 2000, sub: "soda" },
-          { name: "포카리스웨트", price: 1600, sub: "soda" },
-          { name: "TOP 아메리카노", price: 2200, sub: "coffee" }
+          { name: "칠성사이다 Zero", price: 2000, sub: "soda" },
+          { name: "포카리스웨트", price: 1800, sub: "soda" },
+          { name: "몬스터 에너지", price: 2400, sub: "soda" },
+          { name: "웰치스 포도", price: 1700, sub: "soda" },
+          { name: "비타500", price: 1500, sub: "soda" },
+          { name: "TOP 아메리카노", price: 2300, sub: "coffee" },
+          { name: "서울우유 초코우유", price: 1900, sub: "coffee" },
+          { name: "바나나맛 우유", price: 1800, sub: "coffee" },
+          { name: "스벅 돌체라떼 컵", price: 3200, sub: "coffee" }
         ]
       },
       snack: {
@@ -949,7 +994,15 @@
         items: [
           { name: "포카칩 오리지널", price: 1700, sub: "chip" },
           { name: "허니버터칩", price: 1700, sub: "chip" },
-          { name: "홈런볼", price: 1700, sub: "choco" }
+          { name: "새우깡", price: 1600, sub: "chip" },
+          { name: "오징어집", price: 1600, sub: "chip" },
+          { name: "꼬깔콘 고소한맛", price: 1700, sub: "chip" },
+          { name: "콘칩", price: 1600, sub: "chip" },
+          { name: "홈런볼", price: 1700, sub: "choco" },
+          { name: "빈츠", price: 1800, sub: "choco" },
+          { name: "초코파이", price: 1500, sub: "choco" },
+          { name: "오예스", price: 1600, sub: "choco" },
+          { name: "자갈치", price: 1600, sub: "chip" }
         ]
       },
       dessert: {
@@ -958,7 +1011,14 @@
         subCategories: { ice: "아이스크림", bakery: "베이커리" },
         items: [
           { name: "메로나", price: 1200, sub: "ice" },
-          { name: "연세우유 생크림빵", price: 2800, sub: "bakery" }
+          { name: "월드콘", price: 2200, sub: "ice" },
+          { name: "붕어싸만코", price: 1500, sub: "ice" },
+          { name: "스크류바", price: 1200, sub: "ice" },
+          { name: "설레임 밀크", price: 1500, sub: "ice" },
+          { name: "연세우유 생크림빵", price: 3200, sub: "bakery" },
+          { name: "서울우유 생크림빵", price: 3300, sub: "bakery" },
+          { name: "마약옥수수 크림빵", price: 2800, sub: "bakery" },
+          { name: "연세우유 말론초코빵", price: 3400, sub: "bakery" }
         ]
       },
       alcohol: {
@@ -966,8 +1026,15 @@
         icon: "🍺",
         subCategories: { beer: "맥주", soju: "소주/하이볼" },
         items: [
-          { name: "카스 500ml 캔", price: 2800, sub: "beer" },
-          { name: "참이슬 후레쉬", price: 1950, sub: "soju" }
+          { name: "카스 500ml 캔", price: 3000, sub: "beer" },
+          { name: "아사히 생맥주 캔", price: 4500, sub: "beer" },
+          { name: "버드와이저 캔", price: 3000, sub: "beer" },
+          { name: "기린이치방 캔", price: 4000, sub: "beer" },
+          { name: "스텔라 아르투아", price: 4000, sub: "beer" },
+          { name: "참이슬 후레쉬", price: 2100, sub: "soju" },
+          { name: "처음처럼", price: 2100, sub: "soju" },
+          { name: "새로 소주", price: 2100, sub: "soju" },
+          { name: "얼음컵 + 하이볼", price: 4000, sub: "soju" }
         ]
       },
       tobacco: {
@@ -976,7 +1043,13 @@
         subCategories: { comb: "연초", heated: "궐연형" },
         items: [
           { name: "에쎄 체인지 1mg", price: 4500, sub: "comb" },
-          { name: "테리아 앰버", price: 4800, sub: "heated" }
+          { name: "던힐 1mg", price: 4500, sub: "comb" },
+          { name: "말보로 레드", price: 4500, sub: "comb" },
+          { name: "메비우스 LSS 1mg", price: 4500, sub: "comb" },
+          { name: "레종 프렌치 블랙", price: 4500, sub: "comb" },
+          { name: "테리아 앰버", price: 4800, sub: "heated" },
+          { name: "핏 체인지", price: 4800, sub: "heated" },
+          { name: "릴 하이브리드 카트리지", price: 5000, sub: "heated" }
         ]
       }
     };
@@ -1038,7 +1111,7 @@
     }
 
     function updateThemeBtnText(theme) {
-      themeToggleBtn.textContent = theme === "dark" ? "🌙 다크" : "☀️ 라이트";
+      themeToggleBtn.textContent = theme === "dark" ? "다크" : "라이트";
     }
 
     function initAudio() {
@@ -1108,9 +1181,7 @@
       initTheme();
       renderMainCategories();
       
-      // 초기 기본 선택: 첫 번째 카테고리(김밥)의 품목들만 선택되도록 설정
       loadCategoryDefaultItems("gimbap");
-
       switchCategory("gimbap");
 
       themeToggleBtn.addEventListener("click", toggleTheme);
@@ -1145,7 +1216,6 @@
       });
     }
 
-    // 메인 카테고리 전환 시 해당 카테고리 품목들만 선택 상태로 초기화(변경)
     function loadCategoryDefaultItems(key) {
       selectedItems.clear();
       if (DEFAULT_DATABASE[key]) {
@@ -1166,7 +1236,6 @@
       const cat = DEFAULT_DATABASE[key];
       subCategoryHeaderTitle.innerHTML = `<span>${cat.icon} ${cat.name} 품목 상세</span>`;
 
-      // 카테고리 변경 시 해당 카테고리 품목으로 룰렛 자동 초기화
       loadCategoryDefaultItems(key);
 
       renderSubTabs();
