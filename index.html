@@ -519,6 +519,7 @@
       overflow-y: auto;
     }
 
+    /* 일반 피드백 카드 */
     .feedback-card {
       padding: 10px;
       border-radius: 10px;
@@ -527,6 +528,27 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+    }
+
+    /* 공감 1위 베스트 의견 강조 디자인 스타일 */
+    .feedback-card.best-feedback {
+      border: 2px solid #f59e0b;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0.02) 100%);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+    }
+
+    .best-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      background: #f59e0b;
+      color: #ffffff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      width: fit-content;
+      margin-bottom: 2px;
     }
 
     .feedback-text {
@@ -1811,16 +1833,43 @@
         return;
       }
 
-      let likedSet = JSON.parse(localStorage.getItem("likedFeedbacks") || "{}");
+      // 공감(likes)이 높은 순으로 정렬 (공감이 같을 경우 최신 등록순)
+      fbKeys.sort((a, b) => {
+        const likesA = feedbacks[a].likes || 0;
+        const likesB = feedbacks[b].likes || 0;
+        if (likesB !== likesA) {
+          return likesB - likesA; // 공감 많은 순 내림차순
+        }
+        return b.localeCompare(a); // 최신순
+      });
 
-      fbKeys.reverse().forEach(fbId => {
+      let likedSet = JSON.parse(localStorage.getItem("likedFeedbacks") || "{}");
+      const maxLikes = (fbKeys.length > 0) ? (feedbacks[fbKeys[0]].likes || 0) : -1;
+
+      fbKeys.forEach((fbId, index) => {
         const fb = feedbacks[fbId];
         const card = document.createElement("div");
-        card.className = "feedback-card";
+        
+        // 1등(공감 제일 많고 0보다 클 때)이거나 첫 번째 항목인 경우 베스트 강조 스타일 적용
+        const isBest = (index === 0 && (fb.likes || 0) > 0);
+        card.className = isBest ? "feedback-card best-feedback" : "feedback-card";
+
+        const contentWrapper = document.createElement("div");
+        contentWrapper.style.display = "flex";
+        contentWrapper.style.flexDirection = "column";
+        contentWrapper.style.gap = "4px";
+
+        if (isBest) {
+          const badge = document.createElement("div");
+          badge.className = "best-badge";
+          badge.innerHTML = `🔥 공감 1위 베스트 의견`;
+          contentWrapper.appendChild(badge);
+        }
 
         const textEl = document.createElement("div");
         textEl.className = "feedback-text";
         textEl.textContent = fb.text;
+        contentWrapper.appendChild(textEl);
 
         const footer = document.createElement("div");
         footer.className = "feedback-footer";
@@ -1854,7 +1903,7 @@
         footer.appendChild(timeSpan);
         footer.appendChild(actions);
 
-        card.appendChild(textEl);
+        card.appendChild(contentWrapper);
         card.appendChild(footer);
 
         const replyContainer = document.createElement("div");
